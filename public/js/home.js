@@ -1,22 +1,37 @@
+//Abre o modal de transação
 const myModal = new bootstrap.Modal("#transaction-modal");
+//Busca usuário logado sessionStorage e localStorage
 let logged = sessionStorage.getItem("logged")
 const session = localStorage.getItem("session")
 
 let data = {
     transactions: []
 }
-//transaction-modal
-
-document.getElementById("button-logout").addEventListener("click", logout);
-document.getElementById("transactions-button").addEventListener("click", function () {
-    window.location.href = "transactions.html";
-})
 
 checkLogged();
 getCashIn();
 
-//FUNÇÕES
-//ADICIONAR TRANSACAO
+//LISTENERS
+/**
+ * Adiciona listener ao botão logout
+ * que executa a função logout quado clicado
+ */
+document.getElementById("button-logout").addEventListener("click", logout);
+
+/**
+ * Adiciona listerer ao botão transactions
+ * que ao ser clicado direciona a página transactions.html
+ */
+document.getElementById("transactions-button").addEventListener("click", function () {
+    window.location.href = "transactions.html";
+})
+
+/**
+ * Adiciona listener ao formulário de transações,
+ * interceptando o envio (submit) para tratar os dados
+ * manutalmente antes de salvá-los.
+ * @param {Event e} - Evento de submissão de formulário
+ */
 document.getElementById("transaction-form").addEventListener("submit", function (e) {
     e.preventDefault();
 
@@ -44,10 +59,33 @@ document.getElementById("transaction-form").addEventListener("submit", function 
     alert("Lançamento adicionado com Sucesso!")
 })
 
+//FUNCOES
+/**
+ * Salva no localStorage todos os dados do usuário,
+ * incluindo a lista de transações atualizada.
+ * Cada transação contém valor, tipo, descrição e data.
+ * O login do usuário é utilizado como chave de armazenamento.
+ *
+ * @param {Object} data - Objeto completo de dados do usuário,
+ * incluindo o array data.transactions.
+ */
 function saveData(data) {
     localStorage.setItem(data.login, JSON.stringify(data));
 }
 
+/**
+ * Verifica se o usuário está logado.
+ * Caso exista uma sessão persistente (localStorage),
+ * ela é restaurada no sessionStorage.
+ *
+ * Se nenhum usuário estiver logado, o sistema redireciona
+ * imediatamente para a página inicial (index.html).
+ *
+ * Após validar o login, os dados do usuário são carregados
+ * e os valores de entradas, saídas e total são atualizados.
+ *
+ * @returns {void}
+ */
 function checkLogged() {
     if (session) {
         sessionStorage.setItem("logged", session);
@@ -69,12 +107,27 @@ function checkLogged() {
     getTotal();
 }
 
+/**
+ * Realiza o logout do usuário removendo:
+ * - O estado de login do sessionStorage (sessão atual)
+ * - A sessão persistente do localStorage (manter logado)
+ *
+ * Após limpar os dados, o usuário é redirecionado
+ * para a página inicial (index.html).
+ *
+ * @returns {void}
+ */
 function logout() {
     sessionStorage.removeItem("logged");
     localStorage.removeItem("session");
     window.location.href = "index.html";
 }
 
+/**
+ * Gera e exibe a lista de receitas (entradas) filtrando as transações
+ * do usuário pelo tipo "1". Limita a exibição aos últimos 5 registros
+ * e monta dinamicamente o HTML inserindo-o no elemento "cash-in-list".
+ */
 function getCashIn() {
     const transactions = data.transactions;
 
@@ -116,6 +169,11 @@ function getCashIn() {
 
 }
 
+/**
+ * Gera e exibe a lista de despesas (saídas) filtrando as transações
+ * do usuário pelo tipo "0". Limita a exibição aos últimos 5 registros
+ * e monta dinamicamente o HTML inserindo-o no elemento "cash-out-list".
+ */
 function getCashOut() {
     const transactions = data.transactions;
 
@@ -156,7 +214,10 @@ function getCashOut() {
     }
 
 }
-
+/**
+ * Busca o valor total levando em consideração receitas e despesas
+ * exibindo dinamicamente o HTML inserindo-o no elemento "total".
+ */
 function getTotal() {
     const transactions = data.transactions;
     total = 0;

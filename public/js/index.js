@@ -1,9 +1,17 @@
+// Inicializa o modal de cadastro
 const myModal = new bootstrap.Modal("#register-modal");
-let logged = sessionStorage.getItem("logged")
-const session = localStorage.getItem("session")
 
+// Recupera informações de sessão
+let logged = sessionStorage.getItem("logged");
+const session = localStorage.getItem("session");
+
+// Verifica se o usuário já está logado
 checkLogged();
-//CRIAR CONTA
+
+/**
+ * Listener: Criação de nova conta
+ * Valida senha, cria o objeto da conta e salva no localStorage.
+ */
 document.getElementById("create-form").addEventListener("submit", function (e) {
     e.preventDefault();
 
@@ -21,11 +29,15 @@ document.getElementById("create-form").addEventListener("submit", function (e) {
         password,
         transactions: []
     });
-    alert("Conta Criada com Sucesso!")
-    myModal.hide();
-})
 
-//LOGAR NO SISTEMA
+    alert("Conta Criada com Sucesso!");
+    myModal.hide();
+});
+
+/**
+ * Listener: Login no sistema
+ * Valida credenciais e redireciona o usuário caso o login seja bem-sucedido.
+ */
 document.getElementById("login-form").addEventListener("submit", function (e) {
     e.preventDefault();
 
@@ -38,61 +50,74 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
     if (!account) {
         alert("Ops! Usuário/Senha inválido");
         return;
-    } else {
-        if (account.password !== password) {
-            alert("Ops! Usuário/Senha inválido");
-            return;
-        }
-
-        saveSession(email, checkSession);
-
-        window.location.href = "home.html";
     }
 
+    if (account.password !== password) {
+        alert("Ops! Usuário/Senha inválido");
+        return;
+    }
 
-
+    saveSession(email, checkSession);
+    window.location.href = "home.html";
 });
-//FUNÇÕES
 
-// BUSCA CONTA
+/**
+ * Busca e retorna uma conta salva no localStorage.
+ * 
+ * @param {string} key - Email usado como chave no localStorage.
+ * @returns {Object|string} Objeto da conta ou string vazia se não existir.
+ */
 function getAccount(key) {
     const account = localStorage.getItem(key);
-    console.log(account.email)
 
     if (account) {
-        return JSON.parse(localStorage.getItem(key));
+        return JSON.parse(account);
     }
 
     return "";
 }
 
-//CHECAR LOG
+/**
+ * Verifica se existe sessão ativa.
+ * Caso exista, restaura o login e redireciona para home.html.
+ * 
+ * @returns {void}
+ */
 function checkLogged() {
     if (session) {
         sessionStorage.setItem("logged", session);
-
         logged = session;
     }
 
     if (logged) {
         saveSession(logged, session);
-
         window.location.href = "home.html";
     }
 }
 
-// SALVAR CONTA
+/**
+ * Salva os dados da conta no localStorage.
+ *
+ * @param {Object} data - Objeto contendo login, senha e transações.
+ * @returns {void}
+ */
 function saveAcount(data) {
-    //Salvar no LocalStorage
     localStorage.setItem(data.login, JSON.stringify(data));
 }
 
-//SALVAR SESSÃO
+/**
+ * Salva o estado da sessão do usuário.
+ * 
+ * @param {string} data - Email do usuário logado.
+ * @param {boolean} saveSession - Define se a sessão deve persistir após fechar o navegador.
+ * @returns {void}
+ */
 function saveSession(data, saveSession) {
     if (saveSession) {
-        //Salva mesmo ápos fechar a página.
+        // Mantém o login mesmo após fechar o navegador
         localStorage.setItem("session", data);
     }
-    //Perde a informação quando fecha a página.
-    sessionStorage.setItem("logged", data)
+
+    // Sessão válida apenas enquanto o navegador permanece aberto
+    sessionStorage.setItem("logged", data);
 }
